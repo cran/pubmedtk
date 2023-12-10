@@ -1,0 +1,16 @@
+9bf395844d0ec73dacc31ac06ddcd4b6 *DESCRIPTION
+8a026120dcc725392c4ee42947836dd7 *NAMESPACE
+70323c7666d647908b9ffbda3745c6a4 *NEWS.md
+3d298595666a7adde86a12c991c3bc58 *R/get_metadata_from_one_pmid.R
+309e03e7ebc5d5fbd4d38e4010f1d5b6 *R/get_metadata_from_pmids.R
+7f08a48516fc33fe33f4d84f13629f5a *R/get_pmids_from_one_search.R
+0262abaa09fbd9190db9606f65dc2b24 *R/get_pmids_from_searches.R
+cb39efb5cfaab813d5cc28fdccb08820 *R/intersection_check.R
+13052b679e6fc07acd9354dd425f66c1 *R/pubmedtk-package.R
+224e412eff3d77b7fbb5f88a192494b3 *README.md
+03139741b57523c24bff7ec74c1bca59 *man/get_metadata_from_one_pmid.Rd
+b347bfe05721e9724263c32655811b0b *man/get_metadata_from_pmids.Rd
+63d138c944ce4e2967767118f5366533 *man/get_pmids_from_one_search.Rd
+26c71b624e9b408461dd058ebce63324 *man/get_pmids_from_searches.Rd
+ae2567cfe18b0fcbd3dca90d0ca183d4 *man/intersection_check.Rd
+d710b8f21360c200f05eb3a276d2f4f8 *man/pubmedtk-package.Rd
