@@ -5,7 +5,7 @@
 \title{Downloads metadata from Pubmed API for a column of PMID's in a data
 frame}
 \usage{
-get_metadata_from_pmids(df, column, api_key)
+get_metadata_from_pmids(df, column, api_key, quiet = FALSE)
 }
 \arguments{
 \item{df}{A dataframe containing a column of PMID's}
@@ -13,10 +13,14 @@ get_metadata_from_pmids(df, column, api_key)
 \item{column}{The name of the column containing PMID's}
 
 \item{api_key}{A valid Pubmed API key}
+
+\item{quiet}{A boolean TRUE or FALSE. If TRUE, no progress messages
+will be printed during download. FALSE by default, messages
+printed for every version downloaded showing progress.}
 }
 \value{
 A data frame containing the original columns as well as
-five additional columns:
+seven additional columns:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{The `pubmed_dl_success` column is TRUE in the case that
 metadata were successfully downloaded from Pubmed; FALSE in the
@@ -33,6 +37,12 @@ languages for the article in question.
 
 The `pubtypes` column contains a JSON-encoded list of
 publication types for the article in question.
+
+The `pubdate` column contains a character string with the
+publication date
+
+The `epubdate` column contains a character string with the
+e-publication date
 
 The `authors` column contains a JSON-encoded list of authors
 for the article in question.

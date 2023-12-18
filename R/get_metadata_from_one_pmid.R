@@ -5,7 +5,7 @@
 #'
 #' @param api_key A valid Pubmed API key
 #'
-#' @return A named list with 5 elements:
+#' @return A named list with 7 elements:
 #'
 #'     `$pubmed_dl_success`, which is TRUE in the case that a
 #'     corresponding Pubmed record was found and metadata
@@ -19,6 +19,10 @@
 #'
 #'     `$pubtypes`, a list of publication types corresponding to the
 #'     publication with the PMID in question.
+#'
+#'     `$pubdate`, the listed publication date
+#'
+#'     `$epubdate`, the listed e-publication date
 #'
 #'     `$authors`, a list of authors of the publication with the PMID
 #'     in question.
@@ -114,6 +118,18 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
         ) %>%
             xml2::xml_text()
 
+        pubdate <- xml2::xml_find_all(
+            result,
+            "/eSummaryResult/DocSum/Item[@Name='PubDate']"
+        ) %>%
+            xml2::xml_text()
+
+        epubdate <- xml2::xml_find_all(
+            result,
+            "/eSummaryResult/DocSum/Item[@Name='EPubDate']"
+        ) %>%
+            xml2::xml_text()
+
         authors <- xml2::xml_find_all(
             result,
             "/eSummaryResult/DocSum/Item[contains(@Name, 'AuthorList')]/Item[contains(@Name, 'Author')]"
@@ -131,6 +147,8 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
             doi = doi,
             languages = languages,
             pubtypes = pubtypes,
+            pubdate = pubdate,
+            epubdate = epubdate,
             authors = authors
         ) %>%
             return()
@@ -146,6 +164,8 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
             doi = NA,
             languages = NA,
             pubtypes = NA,
+            pubdate = NA,
+            epubdate = NA,
             authors = NA
         ) %>%
             return()
@@ -160,6 +180,8 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
             doi = NA,
             languages = NA,
             pubtypes = NA,
+            pubdate = NA,
+            epubdate = NA,
             authors = NA
         ) %>%
             return()

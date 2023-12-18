@@ -13,7 +13,7 @@ get_metadata_from_one_pmid(pmid, api_key)
 \item{api_key}{A valid Pubmed API key}
 }
 \value{
-A named list with 5 elements:
+A named list with 7 elements:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{`$pubmed_dl_success`, which is TRUE in the case that a
 corresponding Pubmed record was found and metadata
@@ -27,6 +27,10 @@ publication with the PMID in question.
 
 `$pubtypes`, a list of publication types corresponding to the
 publication with the PMID in question.
+
+`$pubdate`, the listed publication date
+
+`$epubdate`, the listed e-publication date
 
 `$authors`, a list of authors of the publication with the PMID
 in question.

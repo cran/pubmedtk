@@ -5,8 +5,14 @@ data via the Pubmed API and interpreting them.
 
 ## Installing
 
-This package is not currently on CRAN (maybe later) and so if you want
-to use it, you will have to do so via `devtools`:
+You can install this package via CRAN with the following:
+
+```
+install.packages("pubmedtk")
+```
+
+Or if you want the most up to date version, you can do so via
+`devtools`:
 
 ```
 install.packages("devtools")
@@ -61,10 +67,10 @@ Example:
 ak <- readLines("api_key.txt")
 
 ## Download PMID's for search query
-results <- get_pmids_from_one_search("Carlisle B[Author]", ak)
+result <- get_pmids_from_one_search("Carlisle B[Author]", ak)
 
 ## Extract first result
-results$pmids[1]
+result$pmids[1]
 ```
 
 ### `get_pmids_from_searches()`
@@ -110,7 +116,7 @@ results <- get_pmids_from_searches(searches, "terms", ak)
 ### `get_metadata_from_one_pmid()`
 
 Downloads metadata from the Pubmed API for a single PMID, and returns
-a named list of 5 elements:
+a named list of 7 elements:
 
 1. `$pubmed_dl_success`, which is TRUE in the case that a
 corresponding Pubmed record was found and metadata downloaded and
@@ -121,7 +127,9 @@ with the PMID in question.
 with the PMID in question.
 4. `$pubtypes`, a list of publication types corresponding to the
 publication with the PMID in question.
-5. `$authors`, a list of authors of the publication with the PMID in
+5. `$pubdate`, a string containing the publication date.
+6. `$epubdate`, a string containing the e-publication date.
+7. `$authors`, a list of authors of the publication with the PMID in
 question.
 
 Example:
@@ -154,7 +162,9 @@ supplied if one is found, NA otherwise.
 for the article in question.
 4. The `pubtypes` column contains a JSON-encoded list of publication
 types for the article in question.
-5. The `authors` column contains a JSON-encoded list of authors for
+5. The `pubdate` column contains a string of the publication date.
+6. The `epubdate` column contains a string of the e-publication date.
+7. The `authors` column contains a JSON-encoded list of authors for
 the article in question.
 
 Example:
@@ -180,8 +190,8 @@ pubs <- tribble(
 pm_meta <- get_metadata_from_pmids(pubs, "pmid", ak)
 
 ## Extract DOI's for those that were successfully downloaded
-pm_meta %>%
-  filter(pubmed_dl_success) %>%
+pm_meta |>
+  filter(pubmed_dl_success) |>
   select(pmid, doi)
 
 ## A tibble: 2 × 2

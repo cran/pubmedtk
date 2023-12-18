@@ -7,8 +7,12 @@
 #'
 #' @param api_key A valid Pubmed API key
 #'
+#' @param quiet A boolean TRUE or FALSE. If TRUE, no progress messages
+#'     will be printed during download. FALSE by default, messages
+#'     printed for every version downloaded showing progress.
+#'
 #' @return A data frame containing the original columns as well as
-#'     five additional columns:
+#'     seven additional columns:
 #'
 #'     The `pubmed_dl_success` column is TRUE in the case that
 #'     metadata were successfully downloaded from Pubmed; FALSE in the
@@ -25,6 +29,12 @@
 #'
 #'     The `pubtypes` column contains a JSON-encoded list of
 #'     publication types for the article in question.
+#'
+#'     The `pubdate` column contains a character string with the
+#'     publication date
+#'
+#'     The `epubdate` column contains a character string with the
+#'     e-publication date
 #'
 #'     The `authors` column contains a JSON-encoded list of authors
 #'     for the article in question.
@@ -67,9 +77,24 @@
 #' 
 #' }
 
-get_metadata_from_pmids <- function(df, column, api_key) {
+get_metadata_from_pmids <- function(
+                                    df,
+                                    column,
+                                    api_key,
+                                    quiet = FALSE
+                                    ) {
     
     out <- tryCatch({
+
+        ## Check that API key is well-formed
+        api_key <- stringr::str_trim(api_key)
+        assertthat::assert_that(
+                        grepl(
+                            "^[0-9a-f]{36}$",
+                            as.character(api_key)
+                        ),
+                        msg="Pubmed API key is not well-formed"
+                    )
 
         ## Check that the column exists in the supplied df
         assertthat::assert_that(
@@ -89,6 +114,8 @@ get_metadata_from_pmids <- function(df, column, api_key) {
                                 "doi",
                                 "languages",
                                 "pubtypes",
+                                "pubdate",
+                                "epubdate",
                                 "authors"
                             )
                             %in%
@@ -98,8 +125,17 @@ get_metadata_from_pmids <- function(df, column, api_key) {
                             "The supplied data frame cannot contain",
                             "columns with the following names:",
                             "pubmed_dl_success, doi, languages,",
-                            "pubtypes, authors"
+                            "pubtypes, pubdate, epubdate, authors"
                             
+                        )
+                    )
+
+        ## Check that `quiet` is boolean
+        assertthat::assert_that(
+                        quiet == TRUE | quiet == FALSE,
+                        msg = paste(
+                            "The `quiet` argument must be",
+                            "TRUE or FALSE"
                         )
                     )
 
@@ -110,13 +146,26 @@ get_metadata_from_pmids <- function(df, column, api_key) {
             ) %>%
             dplyr::pull(column)
 
+        if (! quiet) {
+            message(
+                paste(
+                    length(pmids),
+                    "PMID's to check"
+                )
+            )
+        }
+
         ## Add the new columns
         df$pubmed_dl_success <- as.logical(NA)
         df$doi <- as.character(NA)
         df$languages <- as.character(NA)
         df$pubtypes <- as.character(NA)
+        df$pubdate <- as.character(NA)
+        df$epubdate <- as.character(NA)
         df$authors <- as.character(NA)
 
+        pmid_count <- 0
+        
         for (id in pmids) {
 
             ## Download the metadata
@@ -135,12 +184,12 @@ get_metadata_from_pmids <- function(df, column, api_key) {
             
             df <- df %>%
                 dplyr::mutate(
-                    doi = ifelse(
-                        !!dplyr::sym(column) == id,
-                        pm_metadata$doi,
-                        .data$doi
-                    )
-                )
+                           doi = ifelse(
+                               !!dplyr::sym(column) == id,
+                               pm_metadata$doi,
+                               .data$doi
+                           )
+                       )
 
             df <- df %>%
                 dplyr::mutate(
@@ -170,6 +219,24 @@ get_metadata_from_pmids <- function(df, column, api_key) {
 
             df <- df %>%
                 dplyr::mutate(
+                           pubdate = ifelse(
+                               !!dplyr::sym(column) == id,
+                               pm_metadata$pubdate,
+                               .data$pubdate
+                           )
+                       )
+
+            df <- df %>%
+                dplyr::mutate(
+                           epubdate = ifelse(
+                               !!dplyr::sym(column) == id,
+                               pm_metadata$epubdate,
+                               .data$epubdate
+                           )
+                       )
+
+            df <- df %>%
+                dplyr::mutate(
                            authors = ifelse(
                                !!dplyr::sym(column) == id,
                                      ifelse(
@@ -180,6 +247,25 @@ get_metadata_from_pmids <- function(df, column, api_key) {
                                .data$authors
                            )
                        )
+
+            pmid_count <- pmid_count + 1
+            
+            prop_done <- round(100 * pmid_count / length(pmids))
+
+            if (! quiet) {
+                message(
+                    paste0(
+                        Sys.time(),
+                        " Done ",
+                        pmid_count,
+                        " of ",
+                        length(pmids),
+                        " (",
+                        prop_done,
+                        "%)"
+                    )
+                )                
+            }
             
         }
 

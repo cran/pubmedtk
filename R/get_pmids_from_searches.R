@@ -10,6 +10,10 @@
 #'
 #' @param api_key A valid Pubmed API key
 #'
+#' @param quiet A boolean TRUE or FALSE. If TRUE, no progress messages
+#'     will be printed during download. FALSE by default, messages
+#'     printed for every version downloaded showing progress.
+#'
 #' @return A data frame containing the original columns as well as
 #'     three additional columns:
 #'
@@ -49,9 +53,24 @@
 #' results <- get_pmids_from_searches(searches, "terms", ak)
 #' }
 
-get_pmids_from_searches <- function (df, column, api_key) {
+get_pmids_from_searches <- function (
+                                     df,
+                                     column,
+                                     api_key,
+                                     quiet = FALSE
+                                     ) {
 
     out <- tryCatch({
+
+        ## Check that API key is well-formed
+        api_key <- stringr::str_trim(api_key)
+        assertthat::assert_that(
+                        grepl(
+                            "^[0-9a-f]{36}$",
+                            as.character(api_key)
+                        ),
+                        msg="Pubmed API key is not well-formed"
+                    )
 
         ## Check that the column exists in the supplied df
         assertthat::assert_that(
@@ -81,15 +100,35 @@ get_pmids_from_searches <- function (df, column, api_key) {
                         )
                     )
 
+        ## Check that `quiet` is boolean
+        assertthat::assert_that(
+                        quiet == TRUE | quiet == FALSE,
+                        msg = paste(
+                            "The `quiet` argument must be",
+                            "TRUE or FALSE"
+                        )
+                    )
+
         ## Pull out the queries to be searched
         queries <- df %>%
             dplyr::pull(column)
 
+        if (! quiet) {
+            message(
+                paste(
+                    length(queries),
+                    "queries to be searched"
+                )
+            )
+        }
+        
         ## Add the new columns
         df$pubmed_search_success <- as.logical(NA)
         df$n_results <- as.numeric(NA)
         df$pmids <- as.character(NA)
 
+        query_count <- 0
+        
         for (query in queries) {
 
             ## Perform search
@@ -131,6 +170,25 @@ get_pmids_from_searches <- function (df, column, api_key) {
                                
                            )
                        )
+
+            query_count <- query_count + 1
+            
+            prop_done <- round(100 * query_count / length(queries), digits=3)
+
+            if (! quiet) {
+                message(
+                    paste0(
+                        Sys.time(),
+                        " Done ",
+                        query_count,
+                        " of ",
+                        length(queries),
+                        " (",
+                        prop_done,
+                        "%)"
+                    )
+                )
+            }
         }
 
         return(df)

@@ -5,7 +5,7 @@
 \title{Downloads PMID results for a column of Pubmed search queries in a
 data frame}
 \usage{
-get_pmids_from_searches(df, column, api_key)
+get_pmids_from_searches(df, column, api_key, quiet = FALSE)
 }
 \arguments{
 \item{df}{A dataframe containing a column of Pubmed search
@@ -16,6 +16,10 @@ names: \code{pubmed_search_success}, \code{pmids}.}
 queries}
 
 \item{api_key}{A valid Pubmed API key}
+
+\item{quiet}{A boolean TRUE or FALSE. If TRUE, no progress messages
+will be printed during download. FALSE by default, messages
+printed for every version downloaded showing progress.}
 }
 \value{
 A data frame containing the original columns as well as
