@@ -39,6 +39,9 @@
 #'     The `authors` column contains a JSON-encoded list of authors
 #'     for the article in question.
 #'
+#'     The `abstract` column contains a character string with the
+#'     abstract for the article in question.
+#'
 #' @export
 #'
 #' @importFrom magrittr %>%
@@ -116,7 +119,8 @@ get_metadata_from_pmids <- function(
                                 "pubtypes",
                                 "pubdate",
                                 "epubdate",
-                                "authors"
+                                "authors",
+                                "abstract"
                             )
                             %in%
                             colnames(df)
@@ -125,8 +129,8 @@ get_metadata_from_pmids <- function(
                             "The supplied data frame cannot contain",
                             "columns with the following names:",
                             "pubmed_dl_success, doi, languages,",
-                            "pubtypes, pubdate, epubdate, authors"
-                            
+                            "pubtypes, pubdate, epubdate, authors,",
+                            "abstract"
                         )
                     )
 
@@ -163,6 +167,7 @@ get_metadata_from_pmids <- function(
         df$pubdate <- as.character(NA)
         df$epubdate <- as.character(NA)
         df$authors <- as.character(NA)
+        df$abstract <- as.character(NA)
 
         pmid_count <- 0
         
@@ -245,6 +250,15 @@ get_metadata_from_pmids <- function(
                                          NA
                                      ),
                                .data$authors
+                           )
+                       )
+
+            df <- df %>%
+                dplyr::mutate(
+                           abstract = ifelse(
+                               !!dplyr::sym(column) == id,
+                               pm_metadata$abstract,
+                               .data$abstract
                            )
                        )
 

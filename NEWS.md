@@ -1,3 +1,8 @@
+# pubmedtk 1.0.3
+
+* Added `$abstract` download to `get_metadata_from_one_pmid()` and
+  corresponding column to `get_metadata_from_pmids()`
+
 # pubmedtk 1.0.2
 
 * Added optional progress feedback during download for

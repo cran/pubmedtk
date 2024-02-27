@@ -34,6 +34,9 @@ publication with the PMID in question.
 
 `$authors`, a list of authors of the publication with the PMID
 in question.
+
+`$abstract`, a character string containing the abstract for the
+publication with the PMID in question.
 }\if{html}{\out{</div>}}
 }
 \description{

@@ -27,6 +27,9 @@
 #'     `$authors`, a list of authors of the publication with the PMID
 #'     in question.
 #'
+#'     `$abstract`, a character string containing the abstract for the
+#'     publication with the PMID in question.
+#'
 #' @export
 #'
 #' @importFrom magrittr %>%
@@ -142,6 +145,34 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
         ) %>%
             xml2::xml_text()
 
+        ## Now efetch for the abstract
+       
+        pubmed_query <- list(
+            api_key = api_key,
+            db = "pubmed",
+            id = pmid,
+            retmode = "xml"
+        )
+
+        result <- httr::POST(
+        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
+                            body = pubmed_query,
+                            encode = "form"
+        ) %>%
+            xml2::read_xml()
+
+        closeAllConnections()
+
+        abstract <- xml2::xml_find_all(
+            result,
+            "/PubmedArticleSet/PubmedArticle/MedlineCitation/Article/Abstract/AbstractText"
+        ) %>%
+            xml2::xml_text()
+
+        if (length(abstract) == 0) {
+            abstract <- ""
+        }
+
         list(
             pubmed_dl_success = TRUE,
             doi = doi,
@@ -149,7 +180,8 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
             pubtypes = pubtypes,
             pubdate = pubdate,
             epubdate = epubdate,
-            authors = authors
+            authors = authors,
+            abstract = abstract
         ) %>%
             return()
                 
@@ -166,7 +198,8 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
             pubtypes = NA,
             pubdate = NA,
             epubdate = NA,
-            authors = NA
+            authors = NA,
+            abstract = NA
         ) %>%
             return()
     },
@@ -182,7 +215,8 @@ get_metadata_from_one_pmid <- function(pmid, api_key) {
             pubtypes = NA,
             pubdate = NA,
             epubdate = NA,
-            authors = NA
+            authors = NA,
+            abstract = NA
         ) %>%
             return()
     },

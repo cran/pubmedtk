@@ -116,7 +116,7 @@ results <- get_pmids_from_searches(searches, "terms", ak)
 ### `get_metadata_from_one_pmid()`
 
 Downloads metadata from the Pubmed API for a single PMID, and returns
-a named list of 7 elements:
+a named list of 8 elements:
 
 1. `$pubmed_dl_success`, which is TRUE in the case that a
 corresponding Pubmed record was found and metadata downloaded and
@@ -131,6 +131,7 @@ publication with the PMID in question.
 6. `$epubdate`, a string containing the e-publication date.
 7. `$authors`, a list of authors of the publication with the PMID in
 question.
+8. `$abstract`, a string containing the abstract for the publication.
 
 Example:
 
@@ -149,7 +150,7 @@ mdata$authors[1]
 
 Downloads metadata from Pubmed API for a column of PMID's in a data
 frame, and returns a data frame containing the original columns as
-well as five additional columns:
+well as 8 additional columns:
 
 1. The `pubmed_dl_success` column is TRUE in the case that metadata
 were successfully downloaded from Pubmed; FALSE in the case that an
@@ -166,6 +167,8 @@ types for the article in question.
 6. The `epubdate` column contains a string of the e-publication date.
 7. The `authors` column contains a JSON-encoded list of authors for
 the article in question.
+8. The `abstract` column contains a string of the publication abstract
+   (if it has been captured by Pubmed).
 
 Example:
 

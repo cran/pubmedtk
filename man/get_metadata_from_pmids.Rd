@@ -46,6 +46,9 @@ e-publication date
 
 The `authors` column contains a JSON-encoded list of authors
 for the article in question.
+
+The `abstract` column contains a character string with the
+abstract for the article in question.
 }\if{html}{\out{</div>}}
 }
 \description{
