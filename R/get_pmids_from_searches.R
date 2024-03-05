@@ -131,18 +131,28 @@ get_pmids_from_searches <- function (
         
         for (query in queries) {
 
-            ## Perform search
-            pm_search_result <- get_pmids_from_one_search(
-                query,
-                api_key
-            )
+            ## Error checking
+            if (! is.na(query)) {
+                ## Perform search
+                pm_search_result <- get_pmids_from_one_search(
+                    query,
+                    api_key
+                )
+            } else {
+                
+                pm_search_result <- list(
+                    pubmed_search_success = FALSE,
+                    n_results = 0,
+                    pmids = NA
+                )
+            }
 
             ## Apply it to the data frame
 
             df <- df %>%
                 dplyr::mutate(
                            pubmed_search_success = ifelse(
-                               !!dplyr::sym(column) == query,
+                               ! is.na (query) & !!dplyr::sym(column) == query,
                                pm_search_result$pubmed_search_success,
                                .data$pubmed_search_success
                            )
@@ -151,7 +161,7 @@ get_pmids_from_searches <- function (
             df <- df %>%
                 dplyr::mutate(
                            n_results = ifelse(
-                               !!dplyr::sym(column) == query,
+                               ! is.na(query) & !!dplyr::sym(column) == query,
                                pm_search_result$n_results,
                                .data$n_results
                            )
@@ -160,7 +170,7 @@ get_pmids_from_searches <- function (
             df <- df %>%
                 dplyr::mutate(
                            pmids = ifelse(
-                               !!dplyr::sym(column) == query,
+                               ! is.na(query) & !!dplyr::sym(column) == query,
                                    ifelse(
                                        ! is.na(pm_search_result$pmids),
                                        jsonlite::toJSON(pm_search_result$pmids),

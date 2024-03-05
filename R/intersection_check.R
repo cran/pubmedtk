@@ -10,6 +10,9 @@
 #' 
 #' @param api_key A valid Pubmed API key
 #'
+#' @param quiet A boolean TRUE or FALSE. If TRUE, no progress messages
+#'     will be printed during download. FALSE by default.
+#'
 #' @param batch_size An integer greater than 0 and less than 10000
 #'
 #' @return A data frame containing the original columns, as well as
@@ -60,7 +63,8 @@ intersection_check <- function (
                                 column,
                                 query,
                                 api_key,
-                                batch_size = 1000
+                                batch_size = 1000,
+                                quiet = FALSE
                                 ) {
 
     out <- tryCatch({
@@ -135,7 +139,9 @@ intersection_check <- function (
             dplyr::slice_head() %>%
             dplyr::select(!!dplyr::sym(column))
 
-        message(paste(nrow(pmids), "unique PMID's to check"))
+        if (! quiet) {
+            message(paste(nrow(pmids), "unique PMID's to check"))
+        }
         
         ## Add new columns
         pmids$pm_checked <- FALSE
@@ -147,7 +153,8 @@ intersection_check <- function (
                 dplyr::filter(! .data$pm_checked) %>%
                 utils::head(n=batch_size)
             
-            pmid_search_term <- pmid_batch$pmid %>%
+            pmid_search_term <- pmid_batch %>%
+                dplyr::pull(!!dplyr::sym(column)) %>%
                 paste(collapse="[PMID] OR ") %>%
                 paste0("[PMID]")
 
@@ -185,22 +192,22 @@ intersection_check <- function (
             pmids <- pmids %>%
                 dplyr::mutate(
                     pm_checked = ifelse(
-                        .data$pmid %in% pmid_batch$pmid,
+                        !!dplyr::sym(column) %in% dplyr::pull(pmid_batch, !!dplyr::sym(column)),
                         TRUE,
                         .data$pm_checked
                     )
                 ) %>%
                 dplyr::mutate(
                     found_in_pm_query = ifelse(
-                        .data$pmid %in% found_pmids,
+                        !!dplyr::sym(column) %in% found_pmids,
                         TRUE,
                         .data$found_in_pm_query
                     )
                 ) %>%
                 dplyr::mutate(
                     found_in_pm_query = ifelse(
-                        .data$pmid %in% pmid_batch$pmid &
-                        ! .data$pmid %in% found_pmids,
+                        !!dplyr::sym(column) %in% dplyr::pull(pmid_batch, !!dplyr::sym(column)) &
+                        ! (!!dplyr::sym(column) %in% found_pmids),
                         FALSE,
                         .data$found_in_pm_query
                     )
@@ -211,13 +218,15 @@ intersection_check <- function (
                 nrow()
             
             prop_done <- round(100 * n_done / nrow(pmids), digits=3)
-            
-            message(
-                paste0(
-                    prop_done,
-                    "% done"
+
+            if (! quiet) {
+                message(
+                    paste0(
+                        prop_done,
+                        "% done"
+                    )
                 )
-            )
+            }
         }
 
         out <- df %>%

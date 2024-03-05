@@ -5,7 +5,14 @@
 \title{Checks a column of PMID's for whether or not they would appear in a
 Pubmed search result.}
 \usage{
-intersection_check(df, column, query, api_key, batch_size = 1000)
+intersection_check(
+  df,
+  column,
+  query,
+  api_key,
+  batch_size = 1000,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{df}{A dataframe containing a column of PMID's}
@@ -18,6 +25,9 @@ query}
 \item{api_key}{A valid Pubmed API key}
 
 \item{batch_size}{An integer greater than 0 and less than 10000}
+
+\item{quiet}{A boolean TRUE or FALSE. If TRUE, no progress messages
+will be printed during download. FALSE by default.}
 }
 \value{
 A data frame containing the original columns, as well as

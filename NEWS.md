@@ -1,7 +1,20 @@
+# pubmedtk 1.0.4
+
+* Fixed bug in `intersection_check()` where it would crash if the
+  column supplied was not named "pmid"
+* Fixed bug in `get_pmids_from_searches()` where an NA search can
+  cause unexpected results
+* Added `quiet` option to `intersection_check()` to disable progress
+  messages during download
+
+---
+
 # pubmedtk 1.0.3
 
 * Added `$abstract` download to `get_metadata_from_one_pmid()` and
   corresponding column to `get_metadata_from_pmids()`
+
+---
 
 # pubmedtk 1.0.2
 
